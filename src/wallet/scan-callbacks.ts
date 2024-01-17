@@ -18,7 +18,6 @@ import { setStatusText } from "../ui/status-ui";
 import { getChainForName } from "../network/network-util";
 import { getCurrentRailgunID } from "../wallet/wallet-util";
 import { refreshBalances } from "@railgun-community/wallet";
-import { BigNumber } from 'ethers';
 
 // stringifyBigInts is a replacer function for JSON.stringify that converts
 function stringifyBigInts(key: string, value: any) {
@@ -44,7 +43,7 @@ export const merkelTreeScanCallback = async (
 export const formatLatestBalancesEvent = async () => {
   appendLogWithTimestamp("formatLatestBalancesEvent called");
   const currentPrivateBalances = walletManager.latestPrivateBalanceEvents;
-  appendLogWithTimestamp("currentPrivateBalances before refresh: " + utils.stringify(walletManager.latestPrivateBalanceEvents));
+  appendLogWithTimestamp("currentPrivateBalances BEFORE refresh: "  + JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts));
   if (!isDefined(currentPrivateBalances)) {
     walletManager.latestPrivateBalanceEvents = [];
     return;
@@ -61,7 +60,7 @@ export const formatLatestBalancesEvent = async () => {
 
   refreshBalances(getChainForName(getCurrentNetwork()), [getCurrentRailgunID()]);
   // TODO - make sure the previous refreshBalances call is over before we do this.
-  appendLogWithTimestamp("currentPrivateBalances after refresh: " , JSON.parse(JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts)));
+  appendLogWithTimestamp("currentPrivateBalances AFTER refresh: "  + JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts));
   for (const bucketType in buckets) {
     if (walletManager.merkelScanComplete) {
       const balanceEvent = buckets[bucketType];

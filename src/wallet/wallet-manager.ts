@@ -36,7 +36,7 @@ export const walletManager: WalletManager = {
   // privateBalanceCache: [],
   menuLoaded: false,
   displayPrivate: true,
-  responsiveMenu: true,
+  responsiveMenu: false,
 } as any;
 
 export const getScanProgressString = () => {

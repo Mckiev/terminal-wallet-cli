@@ -7,6 +7,14 @@ import {
 } from "../models/token-models";
 import { getProviderObjectFromURL } from "../models/network-models";
 
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+const polygonInfuraApi = process.env.POLYGON_INFURA_API;
+if (typeof polygonInfuraApi === 'undefined') {
+  throw new Error('POLYGON_INFURA_API is not defined in the environment');
+}
+
 export default {
   apiKeys: {
     zeroXApi: "50451a60-e839-4f7e-a971-bfef488de1cb",
@@ -15,7 +23,7 @@ export default {
     artifactPath: ".artifacts",
     databasePath: ".railgun.db",
     keyChainPath: ".zKeyChains",
-    defaultChain: NetworkName.Ethereum,
+    defaultChain: NetworkName.Polygon,
     defaultNetworks: [
       NetworkName.Ethereum,
       NetworkName.BNBChain,
@@ -91,7 +99,7 @@ export default {
       chainId: 137,
       blockscan: "https://polygonscan.com/",
       providers: [
-        getProviderObjectFromURL("https://rpc-mainnet.matic.quiknode.pro"),
+        getProviderObjectFromURL(polygonInfuraApi),
         getProviderObjectFromURL("https://polygon-bor.publicnode.com"),
         getProviderObjectFromURL("https://polygon-rpc.com"),
         getProviderObjectFromURL("https://rpc-mainnet.maticvigil.com"),

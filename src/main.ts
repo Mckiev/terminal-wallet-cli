@@ -18,7 +18,7 @@ const main = async () => {
     await processSafeExit();
   });
   runMainMenu();
-  latestBalancePoller(10 * 1000);
+  latestBalancePoller(20 * 1000);
 };
 
 clearConsoleBuffer();
