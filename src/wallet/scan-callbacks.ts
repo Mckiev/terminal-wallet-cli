@@ -10,11 +10,23 @@ import {
   updatePrivateBalancesForChain,
   updatePublicBalancesForChain,
 } from "../balance/balance-cache";
-import { readableAmounts } from "../util/util";
+import { readableAmounts, appendLogWithTimestamp } from "../util/util";
 import { ChainIDToNameMap } from "../models/network-models";
 import { getCurrentNetwork, rescanBalances } from "../engine/engine";
 import { walletManager } from "./wallet-manager";
 import { setStatusText } from "../ui/status-ui";
+import { getChainForName } from "../network/network-util";
+import { getCurrentRailgunID } from "../wallet/wallet-util";
+import { refreshBalances } from "@railgun-community/wallet";
+import { BigNumber } from 'ethers';
+
+// stringifyBigInts is a replacer function for JSON.stringify that converts
+function stringifyBigInts(key: string, value: any) {
+  if (typeof value === 'bigint') {
+      return value.toString();
+  }
+  return value;
+}
 
 export const merkelTreeScanCallback = async (
   callbackInfo: MerkletreeScanUpdateEvent,
@@ -30,7 +42,9 @@ export const merkelTreeScanCallback = async (
 };
 
 export const formatLatestBalancesEvent = async () => {
+  appendLogWithTimestamp("formatLatestBalancesEvent called");
   const currentPrivateBalances = walletManager.latestPrivateBalanceEvents;
+  appendLogWithTimestamp("currentPrivateBalances before refresh: " + utils.stringify(walletManager.latestPrivateBalanceEvents));
   if (!isDefined(currentPrivateBalances)) {
     walletManager.latestPrivateBalanceEvents = [];
     return;
@@ -38,13 +52,16 @@ export const formatLatestBalancesEvent = async () => {
   if (!isDefined(walletManager.latestPrivateBalanceEvents)) {
     return;
   }
-
+  
   // sort into each balance bucket, only take the latest one.
   const buckets: MapType<RailgunBalancesEvent> = {};
   for (const balanceEvent of walletManager.latestPrivateBalanceEvents) {
     buckets[balanceEvent.balanceBucket] = balanceEvent;
   }
 
+  refreshBalances(getChainForName(getCurrentNetwork()), [getCurrentRailgunID()]);
+  // TODO - make sure the previous refreshBalances call is over before we do this.
+  appendLogWithTimestamp("currentPrivateBalances after refresh: " , JSON.parse(JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts)));
   for (const bucketType in buckets) {
     if (walletManager.merkelScanComplete) {
       const balanceEvent = buckets[bucketType];
@@ -72,6 +89,7 @@ export const scanBalancesCallback = async (
 };
 
 export const latestBalancePoller = async (pollingInterval: number) => {
+  appendLogWithTimestamp("latestBalancePoller called")
   await formatLatestBalancesEvent().catch((err) => {
     setStatusText(err.message);
   });

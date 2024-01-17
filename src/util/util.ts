@@ -12,6 +12,23 @@ const convertReadable = (tokenAmount: bigint, decimals: number) => {
   return converted;
 };
 
+import { promises as fs } from 'fs';
+import path from 'path';
+import moment from 'moment';
+
+// Function to append log with timestamp
+export async function appendLogWithTimestamp(message: string): Promise<void> {
+    const logFilePath = path.join(__dirname, '..', 'LOG.txt');
+    const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
+    const logEntry = `${timestamp}  :  ${message}\n`;
+
+    try {
+        await fs.appendFile(logFilePath, logEntry);
+    } catch (err) {
+      void 0;
+    }
+}
+
 export const readablePrecision = (
   amount: bigint,
   decimals: number,

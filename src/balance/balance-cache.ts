@@ -14,7 +14,7 @@ import {
   initTokenDatabase,
   tokenDatabase,
 } from "./token-util";
-import { bigIntToHex, delay } from "../util/util";
+import { bigIntToHex, delay, appendLogWithTimestamp } from "../util/util";
 import { TokenDatabaseMap } from "../models/token-models";
 import { getChainForName } from "../network/network-util";
 import { getCurrentEthersWallet } from "../wallet/public-utils";
@@ -156,6 +156,7 @@ export const updatePrivateBalancesForChain = async (
   chainName: NetworkName,
   erc20Balances: RailgunBalancesEvent,
 ): Promise<void> => {
+  appendLogWithTimestamp('updatePrivateBalancesForChain called');
   const chain = getChainForName(chainName);
 
   const { erc20Amounts, balanceBucket, railgunWalletID } = erc20Balances;
@@ -169,15 +170,19 @@ export const updatePrivateBalancesForChain = async (
     await delay(500);
     if (!info) {
       continue;
+      console.log("Token Info not found Continue");
     }
-
+    
     const { decimals } = info;
+    appendLogWithTimestamp(`updatePrivateBalancesForChain: ${tokenAddress} ${amount}`);
+
     privateERC20BalanceCache[chain.type][chain.id][balanceBucket][
       railgunWalletID
     ][tokenAddress] = {
       timestamp: Date.now(),
       balance: { tokenAddress, amount: bigIntToHex(amount), decimals },
     };
+    
   }
 };
 

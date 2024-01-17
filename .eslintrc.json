@@ -57,7 +57,7 @@
         "no-promise-executor-return": 0,
         "@typescript-eslint/no-floating-promises": 0,
         "@typescript-eslint/no-non-null-assertion": 1,
-        "no-warning-comments": 1,
+        "no-warning-comments": 0,
         "@typescript-eslint/no-duplicate-enum-values": 1,
         "no-only-tests/no-only-tests": 1,
         "no-async-promise-executor": 1,

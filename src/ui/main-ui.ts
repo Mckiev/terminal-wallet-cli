@@ -119,17 +119,7 @@ const runNetworkSelectionPrompt = async () => {
     message: "Network Selection",
     choices: [
       { name: NetworkName.Ethereum, message: `${"Ethereum".green} Network` },
-      { name: NetworkName.BNBChain, message: `${"Binance".green} Network` },
       { name: NetworkName.Polygon, message: `${"Polygon".green} Network` },
-      { name: NetworkName.Arbitrum, message: `${"Arbitrum".green} Network` },
-      {
-        name: NetworkName.EthereumGoerli,
-        message: `${"Ethereum Görli".green} Testnet`,
-      },
-      {
-        name: NetworkName.ArbitrumGoerli,
-        message: `${"Arbitrum Görli".green} Testnet`,
-      },
       { name: "exit-menu", message: "Go Back".grey },
     ],
     multiple: false,
