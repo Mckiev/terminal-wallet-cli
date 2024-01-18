@@ -16,6 +16,27 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import moment from 'moment';
 
+// stringifyBigInts is a replacer function for JSON.stringify that converts
+export function stringifyBigInts(key: string, value: any) {
+  if (typeof value === 'bigint') {
+      return value.toString();
+  }
+  return value;
+}
+
+export function getAMANAamount(events: any[]): string {
+  for (const event of events) {
+      if (event.erc20Amounts) {
+          for (const amountEntry of event.erc20Amounts) {
+              if (amountEntry.tokenAddress === "0xb7fa2208b49a65f9b9a85956fad7a3f361b248dd") {
+                  return convertReadable(amountEntry.amount, 18);
+              }
+          }
+      }
+  }
+  throw new Error(`Amount  not found`);
+}
+
 // Function to append log with timestamp
 export async function appendLogWithTimestamp(message: string): Promise<void> {
     const logFilePath = path.join(__dirname, '..', 'LOG.txt');

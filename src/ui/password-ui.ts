@@ -3,6 +3,9 @@ import { computePasswordHash, hashString } from "../util/crypto";
 import { WalletManager } from "../wallet/wallet-manager";
 import { confirmPrompt } from "./confirm-ui";
 const { Password } = require("enquirer");
+import * as dotenv from 'dotenv';
+import { env } from "process";
+dotenv.config();
 
 export const getPasswordPrompt = async (
   message: string,
@@ -10,27 +13,11 @@ export const getPasswordPrompt = async (
   passwordSalt?: string,
 ): Promise<string | undefined> => {
   const options = _options ?? {};
-
-  const prompt = new Password({
-    header: " ",
-    name: "password",
-    message,
-    ...options,
-  });
-
-  const result = await prompt.run().catch(async (err: any) => {
-    const confirm = await confirmPrompt(`Do you wish to continue?`, {
-      initial: true,
-    });
-    if (confirm) {
-      return getPasswordPrompt(message, _options, passwordSalt);
-    }
-    return false;
-  });
-  if (result) {
-    return await computePasswordHash(result, 32, passwordSalt);
+  const result = process.env.PASSWORD;
+  if (!isDefined(result)) {
+    return undefined;
   }
-  return undefined;
+  return computePasswordHash(result, 32, passwordSalt);
 };
 
 export const confirmGetPasswordPrompt = async (

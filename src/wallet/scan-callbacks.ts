@@ -10,7 +10,7 @@ import {
   updatePrivateBalancesForChain,
   updatePublicBalancesForChain,
 } from "../balance/balance-cache";
-import { readableAmounts, appendLogWithTimestamp } from "../util/util";
+import { readableAmounts, appendLogWithTimestamp, getAMANAamount, stringifyBigInts } from "../util/util";
 import { ChainIDToNameMap } from "../models/network-models";
 import { getCurrentNetwork, rescanBalances } from "../engine/engine";
 import { walletManager } from "./wallet-manager";
@@ -19,13 +19,8 @@ import { getChainForName } from "../network/network-util";
 import { getCurrentRailgunID } from "../wallet/wallet-util";
 import { refreshBalances } from "@railgun-community/wallet";
 
-// stringifyBigInts is a replacer function for JSON.stringify that converts
-function stringifyBigInts(key: string, value: any) {
-  if (typeof value === 'bigint') {
-      return value.toString();
-  }
-  return value;
-}
+
+
 
 export const merkelTreeScanCallback = async (
   callbackInfo: MerkletreeScanUpdateEvent,
@@ -43,7 +38,6 @@ export const merkelTreeScanCallback = async (
 export const formatLatestBalancesEvent = async () => {
   appendLogWithTimestamp("formatLatestBalancesEvent called");
   const currentPrivateBalances = walletManager.latestPrivateBalanceEvents;
-  appendLogWithTimestamp("currentPrivateBalances BEFORE refresh: "  + JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts));
   if (!isDefined(currentPrivateBalances)) {
     walletManager.latestPrivateBalanceEvents = [];
     return;
@@ -57,10 +51,10 @@ export const formatLatestBalancesEvent = async () => {
   for (const balanceEvent of walletManager.latestPrivateBalanceEvents) {
     buckets[balanceEvent.balanceBucket] = balanceEvent;
   }
-
+  
   refreshBalances(getChainForName(getCurrentNetwork()), [getCurrentRailgunID()]);
   // TODO - make sure the previous refreshBalances call is over before we do this.
-  appendLogWithTimestamp("currentPrivateBalances AFTER refresh: "  + JSON.stringify(walletManager.latestPrivateBalanceEvents, stringifyBigInts));
+  appendLogWithTimestamp("AMANA AFTER refresh: "  + getAMANAamount(walletManager.latestPrivateBalanceEvents));
   for (const bucketType in buckets) {
     if (walletManager.merkelScanComplete) {
       const balanceEvent = buckets[bucketType];
